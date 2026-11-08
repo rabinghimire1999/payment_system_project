@@ -1,0 +1,114 @@
+# services:
+#   nginx:
+#     image: nginx:alpine
+#     container_name: ipg-nginx
+#     ports:
+#       - "80:80"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+#     depends_on:
+#       - middleware
+#     restart: unless-stopped
+#     networks:
+#       - ipg-net
+
+#   middleware:
+#     build:
+#       context: ./middleware
+#     container_name: ipg-middleware-app
+#     ports:
+#       - "8001:8001"
+#     env_file:
+#       - ./middleware/.env   
+#     extra_hosts:
+#       - "rafiki-backend.testnet.test:${RAFIKI_SERVER_IP}"
+#     depends_on:
+#       - webhook
+#     restart: unless-stopped
+#     networks:
+#       - ipg-net
+
+#   webhook:
+#     build:
+#       context: ./webhook
+#     container_name: ipg-webhook-service
+#     ports:
+#       - "8002:8002"
+#     env_file:
+#       - ./webhook/.env
+#     depends_on:
+#       - redis
+#     restart: unless-stopped
+#     networks:
+#       - ipg-net
+
+#   redis:
+#     image: redis:7-alpine
+#     container_name: redis-webhook
+#     restart: always
+#     ports:
+#       - "6380:6379"
+#     volumes:
+#       - redis_data:/data
+#     networks:
+#       - ipg-net
+      
+# volumes:
+#   redis_data:
+
+# networks:
+#   ipg-net:
+#     driver: bridge
+
+
+services:
+  middleware:
+    build:
+      context: ./middleware
+    container_name: ipg-middleware-app
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./middleware/.env
+    extra_hosts:
+      - "rafiki-backend.testnet.test:${RAFIKI_SERVER_IP}"
+    depends_on:
+      - webhook
+    restart: unless-stopped
+    networks:
+      - ipg-net
+      - ipg-shared
+
+  webhook:
+    build:
+      context: ./webhook
+    container_name: ipg-webhook-service
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./webhook/.env
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - ipg-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-webhook
+    restart: always
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ipg-net
+
+volumes:
+  redis_data:
+
+networks:
+  ipg-net:
+    driver: bridge
+  ipg-shared:
+    external: true

@@ -1,0 +1,19 @@
+# Ignore virtual environments
+**/venv/
+**/.venv/
+venv/
+.venv/
+
+# Ignore Python caches
+**/__pycache__/
+*.py[cod]
+
+# Ignore DB files
+*.db
+*.sqlite3
+
+# Ignore env files
+.env
+
+#gitignore
+.gitignore.env
